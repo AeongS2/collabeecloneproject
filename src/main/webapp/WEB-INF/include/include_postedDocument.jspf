@@ -1,0 +1,743 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+
+<meta charset="UTF-8">
+<title>발행된 문서</title>
+<style>
+	body, *{
+	    font-family: -apple-system,BlinkMacSystemFont,Malgun Gothic,Hiragino Kaku Gothic ProN,Hiragino Sans,Meiryo,MS PGothic,sans-serif,Dotum;
+	    box-sizing: border-box;
+	    margin:0;
+	    padding:0;
+	    outline: none;
+	}
+	a{
+		text-decoration:none;
+	}
+	input, button{
+	    border:none;
+	}
+	header{
+	    display:flex; 
+	    flex-direction:row; 
+	    justify-content:space-between;
+	    border-bottom:1px solid rgb(225,225,225);
+	    position:fixed;
+	    top:0;
+	    left:0;
+	    right:0;
+	    background-color: rgb(255,255,255);
+	    z-index: 101;
+        height: 72px;
+    	padding: 12px 24px 12px 16px
+	}
+	.drafts_tab1{
+	    display:flex;
+	    color:rgb(136,136,136);
+	    font-size:12px;
+	    align-items:center;
+	    padding:20px;
+	}
+	.drafts_tab1 button + label{
+	    margin-left:20px;
+	}
+	.drafts_tab2{
+	    display:flex;
+	    align-items:center;
+	    margin-right:20px
+	}
+	#drafts_del{
+	    box-shadow:0 0 8px 2px rgb(0 0 0 / 10%);
+	    font-size:13px;
+	    border:1px solid #e1e1e1;
+	    border-radius:4px;
+	    position:absolute;
+	    background-color:rgb(255,255,255);
+	    width: 190px;
+	    padding:15px 20px;
+	    transform: translate3d(-20px, 45px, 0px);
+	    cursor:pointer;
+	    z-index:100;
+	}
+	#drafts_del:hover{
+	  background-color:#f2f2f2;
+	}
+	#drafts_ws{
+	    background-color: rgb(255, 255, 255);
+	    border: 1px solid rgb(51, 132, 108);
+	    border-radius:4px;
+	    width: 180px;
+	    color:rgb(51, 132, 108);
+	    padding: 6px 10px 6px 15px;
+	    overflow:hidden;
+	    display:flex;
+	    justify-content:space-between;
+	    cursor:pointer;
+	}
+	.icon_color2{
+	    fill:rgb(51, 132, 108);
+	}
+	#drafts_save{
+	    background-color:rgb(51, 132, 108);
+	    color:rgb(255, 255, 255);
+	    border-radius:4px;
+	    border:1px solid rgb(51, 132, 108);
+	    padding:7px 28px;
+	    font-size:12px;
+	    font-weight:500;
+	    cursor:pointer;
+	    margin-left:15px;
+	    transition: background-color 0.2s ease 0s, color 0.2s ease 0s, border-color 0.4s ease 0s, fill 0.2s ease 0s, opacity 0.2s ease 0s;
+	}
+	#drafts_save:hover{
+	    background-color: rgb(42, 98, 81);
+	    border-color: rgb(42, 98, 81);
+	}
+	.drafts_sec{
+	    width: 1px;
+	    height: 32px;
+	    background-color: rgb(225, 225, 225);
+	    margin: 0px 24px;
+	}
+	
+	#drafts_list{
+	    flex-direction:column;
+	    font-size:13px;
+	    width: 240px;
+	    background-color: rgb(255, 255, 255);
+	    border-right: 1px solid rgb(225, 225, 225);
+	    padding-top:66px;
+	    overflow:scroll;
+	    height:100%;
+	    position:fixed;
+	    z-index:100;
+	}
+	#drafts_cnt{
+	    font-weight:bold;
+	    font-size:12px;
+	    color:rgb(136,136,136);
+	    background-color:rgb(250, 250, 250);
+	    height: 32px;
+	    padding:8px 0px 8px 18px;
+	}
+	.drafts_post{
+	    padding:15px 20px;
+	    border-bottom:1px solid rgb(225, 225, 225);
+	    cursor:pointer;
+	    line-height:1.5;
+	}
+	.drafts_title{
+	    display:flex;
+	    flex-direction:row;
+	    align-items:center;
+	    font-size:14px;
+	    /* font-weight:bold; */
+	}
+	.drafts_title img{
+	    width: 18px;
+	    height: 18px;
+	    cursor: pointer;
+	}
+	.drafts_info{
+	    color:rgb(136,136,136);
+	    display:flex;
+	    align-items:center;
+	    font-size:12px;
+	}
+	.drafts_ws2{
+	    color:rgb(51, 132, 108);
+	    margin-left:7px;
+	}
+	.drafts_scrollbar{
+	    background: #e1e1e1;
+	}
+	.drafts_scrollbar::-webkit-scrollbar{
+	    width:4px;
+	}
+	.drafts_scrollbar::-webkit-scrollbar-thumb{
+	    border-radius:2px;
+	    height:40%;
+	    background-color: #e1e1e1;
+	}
+	::-webkit-scrollbar{
+	  width:4px;
+	}
+	::-webkit-scrollbar-thumb{
+	  border-radius:2px;
+	  height:40%;
+	  background-color: #e1e1e1;
+	}
+	.hidden{
+	  visibility:hidden;
+	  opacity:0;
+	}
+	.none{
+	  display:none;
+	  opacity:0;
+	}
+	.alert{
+	    background-color:rgb(66,64,63);
+	    color:rgb(255,255,255);
+	    font-size:14px;
+	    width:320px;
+	    height:auto;
+	    border-radius:4px;
+	    position:absolute;
+	    bottom:0;
+	    margin:20px;
+	    padding:16px;
+	    overflow:auto;
+	    line-height:1.5;
+	    display:none;
+	    z-index:200;
+	    box-shadow: 0px 11px 15px -7px rgb(0 0 0 / 20%), 0px 24px 38px 3px rgb(0 0 0 / 14%), 0px 9px 46px 8px rgb(0 0 0 / 12%);
+	}
+	.closed{
+	    margin-left:20px;
+	    float:right;
+	    cursor:pointer;
+	}
+	
+</style>
+<style>
+	.row{
+		display:flex;
+		flex-direction:row;
+	}
+	.column{
+		display:flex;
+		flex-direction:column;
+	}
+	.document_header{
+		max-width: 650px;
+		margin: 0 auto;
+		margin-bottom:30px;
+	}
+	.document_kanban{
+		padding: 1px 5px;
+		border: 1px solid rgb(224, 221, 217);
+		border-radius: 6px;
+		background-color: transparent;
+		cursor: pointer;
+		display: flex;
+		flex-direction: row;
+		-webkit-box-align: center;
+		align-items: center;
+		transition: fill 0.2s ease 0s;
+		color: #75726f;
+		font-size: 14px;
+	}
+	.document_kanban:hover{
+	  background-color: rgb(247, 246, 245);
+	}
+	.document_ws{
+		overflow: hidden;
+		display: inline-block;
+		margin-left: 6px;
+		padding: 2px 8px;
+		border-radius: 6px;
+		background-color: rgb(234, 242, 240);
+		color: rgb(51, 132, 108);
+		font-size: 14px;
+		line-height: 24px;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		transition: color 0.2s ease 0s;
+  	}
+	.document_title{
+	    border:none;
+	    font-size:36px;
+	    line-height:46px;
+	    font-weight:bold;
+	    padding-top:5px;
+	    width: 100%;
+	    resize:none;
+	    height:auto;
+	    overflow: hidden;
+	}
+	.document_title::placeholder{
+	   color:rgb(196,196,196);
+	}
+  	.drafts_bnt{
+	  	width:22px;
+	  	height:22px;
+  		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 22'%3E%3Cg fill='grey' fill-rule='evenodd'%3E%3Cpath d='M14.823 2.083c.773 0 1.454.51 1.676 1.254l2.251 8.33v4.166c0 1.15-.933 2.084-2.083 2.084H3.333a2.083 2.083 0 0 1-2.083-2.084v-4.166l2.25-8.33a1.751 1.751 0 0 1 1.677-1.254h9.646zm0 1.167H5.177a.585.585 0 0 0-.522.32l-.028.071-2.169 8.026h5.459a2.083 2.083 0 0 0 4.166 0h5.458L15.38 3.67a.586.586 0 0 0-.474-.415l-.084-.006zm-.678 5.25c.334 0 .605.261.605.583 0 .322-.27.584-.605.584h-8.29a.594.594 0 0 1-.605-.584c0-.322.27-.583.605-.583h8.29zm-.908-3.333a.59.59 0 0 1 .596.583.59.59 0 0 1-.596.583H6.763a.59.59 0 0 1-.596-.583.59.59 0 0 1 .596-.583h6.474z'%3E%3C/path%3E%3C/g%3E%3C/svg%3E");
+  		cursor:pointer;
+  	}
+  	.codex-editor--narrow .codex-editor__redactor{
+		width:600px;
+	}
+</style>
+<style>
+	#kanban_selector{
+		display: none;
+		z-index: 101;
+		position: absolute;
+	    top: 0px;
+	    left: 0px; 
+	}
+	#div_background {
+		display: none;
+		z-index: 100;
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom : 0;
+		width: 100%;
+		height: 100%;
+		/* background-color: rgba(0,0,0,0.5); */
+		background-color: transparent;
+	}
+	.kanban_selector_center{
+		max-width: 332px;
+	    min-width: 180px;
+	    display: flex;
+	    flex-direction: column;
+	    border-radius: 6px;
+	    box-shadow: rgb(0 0 0 / 5%) 0px 0px 0px 1px, rgb(0 0 0 / 10%) 0px 2px 4px, rgb(0 0 0 / 15%) 0px 8px 16px;
+	    background-color: rgb(255, 255, 255);
+	    padding-top: 12px;
+	    padding-bottom: 12px;
+	    width: 184px;
+	}
+	.kanban_selector_title{
+		display: block;
+	    font-weight: normal;
+	    font-size: 12px;
+	    color: rgb(136, 136, 136);
+	    line-height: 1.5;
+	    padding: 0px 10px 4px 15px;
+	}
+	.kanban_selector_menu{
+		max-height: 286px;
+	    overflow: hidden auto;
+	    display: flex;
+	    flex-direction: column;
+	}
+	.kanban_selector_menu_button{
+		cursor: pointer;
+	    border: none;
+	    display: flex;
+	    flex-direction: row;
+	    align-items: center;
+	    color: rgb(34, 34, 34);
+	    background-color: rgb(255, 255, 255);
+	    padding: 5px 8px 5px 13px;
+	    transition: background-color 0.2s ease 0s;
+	    text-align: left;
+	}
+	.kanban_selector_menu_button:hover{
+		background-color: rgb(242, 242, 242);
+	}
+	.kanban_img{
+		margin-right: 2px;
+	    flex-shrink: 0;
+        width: 20px;
+	    height: 20px;
+	}
+	.kanban_selector_name{
+		white-space: nowrap;
+	    text-overflow: ellipsis;
+	    overflow: hidden;
+	    margin-right: 2px;
+	    color: rgb(34, 34, 34);
+	    font-size: 13px;
+	    max-width: 250px;
+	    flex: 1 1 0%;
+	    line-height: 24px;
+	}
+	
+</style>
+
+<script>
+	$(function(){
+		var workspaceId = <%=request.getParameter("workspaceId")%>;
+    	var workspaceName = "<%=request.getParameter("workspaceName")%>";
+    	var loginId = <%=request.getParameter("loginId")%>;
+    	var documentId = <%=request.getParameter("documentId")%>
+    	
+	  //제목 칸에 맞춰 늘어나기
+	    $(".document_title").on('keydown', function() {
+	        var title = $(this).val()
+	        var height1 = $(this).prop("scrollHeight");
+	        $(this).css("height", height1);
+	    
+	        if(title.length > 150) {
+	            $(this).val(title.substring(0, 150));
+	              
+	            //안내메세지 뜨기
+	            var alert_message = $(".alert").html("제목은 150자까지 입력할 수 있습니다.");
+	            alert_message.fadeIn(function(){
+	                setTimeout(function() {
+	                  alert_message.fadeOut() //3초후에 자동으로 닫힘
+	                }, 3000);
+	            });
+	            
+	            //안내메세지 높이
+	            var height2 = alert_message.prop("scrollHeight");
+	            alert_message.css("height", height2);
+	        } 
+	    });
+	    //다시 줄어들기
+	      $(".document_title").on("keyup", function(){
+	          $(this).css("height", "auto"); //다시 오토로 만들고
+	          var height = $(this).prop("scrollHeight"); //스크롤 길이 측정
+	          $(this).css("height", height); //스타일에 대입
+	      });
+
+	    //칸반 선택
+    $(".document_kanban").click(function() {
+	   	var px = $(this).offset().left;	/* 클릭한 현재위치 가로 */
+	   	var py = $(this).offset().top+ 25;
+	   	$("#kanban_selector").css('left',px+'px');
+	   	$("#kanban_selector").css('top',py+'px');
+		
+		$("#kanban_selector").css('display', 'block');
+		$("#div_background").css('display', 'block');
+	});
+	    
+ 	$("#div_background").click(function() {
+   		$("#div_background").css('display', 'none');
+ 		$("#kanban_selector").css('display', 'none');
+ 	});
+ 	
+ 	$(".kanban_selector_menu_button").click(function(){
+ 		var text = $(this).find(".kanban_selector_name").text();
+ 		var img = $(this).find(".kanban_img").attr("src");
+ 		
+ 		$(".document_kanban").find("img").attr("src", img);
+ 		$(".document_kanban").find("span").html(text);
+		$("#kanban_selector").css("display","none");
+  	});
+	});
+</script>
+</head>
+<body>
+
+	<div id="kanban_selector" role="tooptip" >
+	<div class="kanban_selector_center">
+		
+		<h6 class="kanban_selector_title">문서상태변경</h6>
+		<!-- <a>칸반으로 이동 (톱니바퀴모양 이미지)</a> -->
+		
+		<div class="kanban_selector_menu">
+			<button class="kanban_selector_menu_button">
+				<img src="https://down.collabee.co/postStatus/1603707" size="20" class="kanban_img">
+				<span class="kanban_selector_name">발의됨</span>
+			</button>
+			
+			<button class="kanban_selector_menu_button">
+				<img src="https://down.collabee.co/postStatus/1603708" size="20" class="kanban_img">
+				<span class="kanban_selector_name">진행중</span>
+			</button>
+		</div>
+	</div>
+	</div>
+	
+	<div id="div_background"></div>	
+
+<!--제목과 문서 에디터-->	
+	<div style="margin-top:121px; justify-content:center;"> 
+	  
+	  <div class="document_header column">
+	    <div class="row">
+	      <button class="document_kanban"><img src="https://down.collabee.co/postStatus/1603707" style="width:18px; height:18px;"/><span>발의됨</span><svg xmlns="http://www.w3.org/2000/svg" width="8" height="4" viewBox="0 0 8 4"><path d="M0 0l4 4 4-4z" fill="#888888" fill-rule="evenodd"></path></svg></button>
+	      <div class="document_ws">코드공유 공간</div>
+	    </div>
+	    <textarea placeholder="제목을 입력해 주세요." class="document_title" maxlength="150" rows="1"></textarea>
+	  </div>
+
+	<!-- 문서 에디터-->
+	<div class="ce-example" style="margin-right: 50px;">
+	  <div class="ce-example__content _ce-example__content--small">
+	    <div id="editorjs" style="margin-left: 50px;"></div>
+	
+	    <div class="ce-example__button" id="saveButton">
+	   
+	    </div>
+	  </div>
+	  <div class="ce-example__output">
+	    <pre class="ce-example__output-content" id="output"></pre>
+	  </div>
+	</div>
+     <script>
+    
+	</script>
+  <!-- Load Tools -->
+  <!--
+   You can upload Tools to your project's directory and connect them by relative links.
+
+   Also you can load each Tool from CDN or use NPM/Yarn packages.
+
+   Read more at Tools Connection doc:
+   https://editorjs.io/getting-started#tools-connection
+   -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script><!-- Header -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest"></script><!-- Image -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest"></script><!-- Delimiter -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script><!-- List -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest"></script><!-- Checklist -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script><!-- Quote -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script><!-- Code -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest"></script><!-- Embed -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/table@latest"></script><!-- Table -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/link@latest"></script><!-- Link -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/warning@latest"></script><!-- Warning -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/marker@latest"></script><!-- Marker -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest"></script><!-- Inline Code -->
+
+  <!-- Load Editor.js's Core -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+
+  <!-- Initialization -->
+  <script>
+  var x="<svg viewBox='0 0 24 24' width='24px' height='24px' class='closed'><path fill='rgb(255,255,255)' d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'></path></svg>"
+	   
+    /**
+     * To initialize the Editor, create a new instance with configuration object
+     * @see docs/installation.md for mode details
+     */
+    var editor = new EditorJS({
+      /**
+       * Enable/Disable the read only mode
+       */
+      readOnly: false,
+
+      /**
+       * Wrapper of Editor
+       */
+      holder: 'editorjs',
+
+      /**
+       * Common Inline Toolbar settings
+       * - if true (or not specified), the order from 'tool' property will be used
+       * - if an array of tool names, this order will be used
+       */
+      // inlineToolbar: ['link', 'marker', 'bold', 'italic'],
+      // inlineToolbar: true,
+
+      /**
+       * Tools list
+       */
+      tools: {
+        /**
+         * Each Tool is a Plugin. Pass them via 'class' option with necessary settings {@link docs/tools.md}
+         */
+        header: {
+          class: Header,
+          inlineToolbar: ['marker', 'link'],
+          config: {
+            placeholder: 'Header'
+          },
+          shortcut: 'CMD+SHIFT+H'
+        },
+
+        /**
+         * Or pass class directly without any configuration
+         */
+        image: SimpleImage,
+
+        list: {
+          class: List,
+          inlineToolbar: true,
+          shortcut: 'CMD+SHIFT+L'
+        },
+
+        checklist: {
+          class: Checklist,
+          inlineToolbar: true,
+        },
+
+        quote: {
+          class: Quote,
+          inlineToolbar: true,
+          config: {
+            quotePlaceholder: 'Enter a quote',
+            captionPlaceholder: 'Quote\'s author',
+          },
+          shortcut: 'CMD+SHIFT+O'
+        },
+
+        warning: Warning,
+
+        marker: {
+          class:  Marker,
+          shortcut: 'CMD+SHIFT+M'
+        },
+
+        code: {
+          class:  CodeTool,
+          shortcut: 'CMD+SHIFT+C'
+        },
+
+        delimiter: Delimiter,
+
+        inlineCode: {
+          class: InlineCode,
+          shortcut: 'CMD+SHIFT+C'
+        },
+
+        linkTool: LinkTool,
+
+        embed: Embed,
+
+        table: {
+          class: Table,
+          inlineToolbar: true,
+          shortcut: 'CMD+ALT+T'
+        },
+
+      },
+
+      /**
+       * This Tool will be used as default
+       */
+      // defaultBlock: 'paragraph',
+
+      /**
+       * Initial Editor data
+       */
+     /*  data: {
+     
+      }, */
+      onReady: function(){
+    	  $.ajax({//문서 읽어오기
+  			type:"post",
+  			url:"Controller?command=showNewDocument",
+  			data:{
+  				"documentId":documentId
+  			},
+  			datatype:"json",
+  			success:function(data){
+  					editor.blocks.clear();//block 비우기
+  					$(".document_title").val(data.title);
+  					$(".postedTitle").text(data.title);
+  					var json_object = JSON.parse(data.content);
+  					for(var i=0; i<=json_object.blocks.length-1; i++) {
+  						editor.blocks.insert(json_object.blocks[i].type, json_object.blocks[i].data);
+  					} // json_obj 가져와서 출력하기
+  					
+  					//$(".document_kanban")attr("bookmarkId")==data.bookmarkId 인걸로 바꾸기
+  					if(data.pic!=0){
+	  					$(".postedBnt1").children("span:nth-child(2)").text(data.pic);
+  					}
+  			
+	  			$.ajax({ //북마크, 알림, 일정
+	  				type:"post",
+	  				url:"Controller?command=documentEtc",
+	  				data:{
+	  					"documentId":documentId,
+	  					"loginId":loginId
+	  				},
+	  				datatype:"json",
+	  				success:function(data){
+	  					var fill;
+	  					if(workspaceName=='프라이빗 공간') {
+	  						fill = "rgb(217, 173, 43)";
+	  					} else {
+	  						fill = "rgb(51, 132, 108)"; 
+	  					}
+	  					
+  						if(data.alarm == 1){//알람 킨거면
+  							$("#postAlarm").html("<svg viewBox='0 0 24 24' width='20px' height='20px'><path fill='"+fill+"' d='M11.65 21c.99 0 1.8-.81 1.8-1.8h-3.6c0 .99.81 1.8 1.8 1.8zm5.85-5.4v-4.95A5.848 5.848 0 0 0 13 4.962V4.35C13 3.603 12.397 3 11.65 3c-.747 0-1.35.603-1.35 1.35v.612a5.848 5.848 0 0 0-4.5 5.688v4.95L4 17.4v.9h15.3v-.9l-1.8-1.8z'></path></svg>");	
+  						} else {//알람 끈거면
+  							$(".postBnt2 span").html("<svg id='noAlarm' width='20px' height='20px' viewBox='0 0 24 24'><path fill='#888888' d='M13.99 19.5c0 .28-.05.54-.15.78-.26.6-.79 1.04-1.44 1.18-.087.02-.173.031-.263.036L12 21.5c-1.06 0-1.919-.82-2.003-1.851L9.99 19.5h4zM4 4.26l1.27-1.27L21 19.22l-1.27 1.27-1.916-1.99H4v-1l2-2v-5c0-1.266.275-2.444.8-3.44L4 4.26zm4.004 5.996L8 10.5v5.828l-.173.172h8.062L8.297 8.615c-.171.492-.271 1.042-.293 1.641zM12 2c.781 0 1.42.593 1.493 1.355l.007.145v.68c2.776.66 4.402 3.1 4.496 6.05l.004.27v2.577l-2-2.063V10.5c0-2.208-1.06-3.822-2.77-4.323l-.193-.051-1.036-.247-.795.189-1.565-1.614c.195-.08.399-.15.609-.21l.25-.064V3.5c0-.781.593-1.42 1.355-1.493L12 2z'></path></svg>");
+  						}
+  						if(data.bookmark == 1){//북마크 설정한거면
+  							$("#postBookmark").html("<svg width='20px' height='20px' viewBox='0 0 24 24'><path fill='"+fill+"' fill-rule='evenodd' d='M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z'></path></svg>");	
+  			    	 		
+  						} else {//북마크 해제한거면
+  							$(this).html("<svg id='noBookmark' width='20px' height='20px' viewBox='0 0 24 24'><path fill-rule='evenodd' fill='#888888' d='M17 3c1.05 0 1.918.866 1.994 1.954l.006.157V22l-7-3.167L5 22l.01-16.889c0-1.108.81-2.024 1.841-2.105L7 3h10zm0 2H7c.014 0 .018.004.018.015l-.008.097L7.001 18.9 12 16.639l5 2.261V5.111c0-.06-.017-.092-.012-.105L17 5z'></path></svg>");
+  						}
+	  				},
+	  				error:function(data){
+	  					alert("error!");
+	  				}
+	  			});
+  			},
+  			error:function(r,s,e){
+  				alert("error!");	
+  			}
+  		});
+        //saveButton.click();
+      },
+      
+      onChange: function(api, event) {
+    	  $("#saveButton span").text("문서 수정");
+      } 
+    });
+
+    /**
+     * Saving button
+     */
+    const saveButton = document.getElementById('saveButton');
+    /**
+     * Toggle read-only button
+     */
+   /*  const toggleReadOnlyButton = document.getElementById('toggleReadOnlyButton');
+    const readOnlyIndicator = document.getElementById('readonly-state'); */
+
+    /**
+     * Saving example
+     */
+    saveButton.addEventListener('click', function () {
+      editor.save()
+        .then(function(savedData) { //죽일놈의 세션
+    		$.ajax({
+    			type:"post",
+    			url:"Controller?command=saveDocument",
+    			data: /* savedData */
+    			{
+    					"loginId":loginId,
+    				"workspaceId":workspaceId,
+    					"title":$(".document_title").val(),
+    				"content": JSON.stringify(savedData), 
+    				"documentId":documentId
+    				//블럭데이터 넣기
+    			},
+    			datatype:"json",
+    			success:function(data){
+    				var alert_message = $(".alert").html(x+"저장 됐습니다.");
+    					alert_message.fadeIn(function(){
+    		              	setTimeout(function(){
+    		                alert_message.fadeOut();
+    		              }, 3000);
+    		            });
+    		            //글자수에 따라 높이 정하기
+    		            var height = alert_message.prop("scrollHeight");
+    		            alert_message.css("height", height);
+    			},
+    			error:function(r,s,e) {
+    				console.log("ERROR - ajax:saveDocument");
+    			}
+    		});
+    		
+        })
+        .catch((error) => {
+          console.error('Saving error', error);
+        });
+    });
+
+    /**
+     * Toggle read-only example
+     */
+ /*   toggleReadOnlyButton.addEventListener('click', async () => {
+      const readOnlyState = await editor.readOnly.toggle();
+
+      readOnlyIndicator.textContent = readOnlyState ? 'On' : 'Off';
+    }); */
+  </script>
+</div> <!-- 제목과 에디터 끝-->
+</div> 
+</body>
+</html>

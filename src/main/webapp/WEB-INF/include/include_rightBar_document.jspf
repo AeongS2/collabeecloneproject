@@ -1,0 +1,263 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+    
+    
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+ 	<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	
+</head>
+	<style> /*오른쪽 바*/
+		*{
+            box-sizing: border-box;
+        }
+		body, div {
+			font-family: -apple-system,BlinkMacSystemFont,Malgun Gothic,Hiragino Kaku Gothic ProN,Hiragino Sans,Meiryo,MS PGothic,sans-serif,Dotum;
+			margin:0;
+			padding:0;
+			box-sizing: border-box;
+		}
+		a{
+			text-decoration:none;
+		}
+		input, button{
+			border:none;
+			outline:none;
+			box-shadow:none;
+		}
+		#right_bar{
+			background-color: transparent;
+			flex: 0 0 auto;
+			width: 250px;
+			overflow-y: auto;
+			height: calc((100vh - 126px) - 38px);
+			padding: 42px 0px 20px 14px;
+			/* position: absolute; */
+    		right: 0;
+    		/* top: 295px; */
+		}
+		.schedule_icon{
+			width:17px;
+			height:17px;
+			padding:8px;
+			margin-top:5px;
+		}
+		.icon_sche1{
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='fill: rgb(225,225,225);' viewBox='0 0 24 24'%3E%3Cpath d='M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z' color='%23E1E1E1'%3E%3C/path%3E%3C/svg%3E");
+		}
+		.icon_sche2{
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' style='fill: rgb(196,196,196);' viewBox='0 0 24 24'%3E%3Cpath d='M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z' color='%23E1E1E1'%3E%3C/path%3E%3C/svg%3E");
+		}
+		.post_schedule{
+			padding-bottom: 4px;
+			color: rgb(136, 136, 136);
+			font-size: 14px;
+			line-height: 1.57;
+			transition: color 0.2s ease 0s;
+			cursor:pointer;
+		}
+		#right_bar ::placeholder{
+			border: none;
+			border-radius: 0px;
+			width: 168px;
+			background-color: rgb(255, 255, 255);
+			font-size: 12px;
+			color:rgb(196,196,196);
+			line-height: 1.5;
+			margin-bottom: 2px;
+		}
+		#startD, #endD, input[title="오늘 날짜"], [title="일정제목"]{
+			margin-left:7px;
+			color: rgb(34, 34, 34);
+			font-size: 12px;
+			line-height: 1.5;
+			transition: color 0.2s ease 0s;
+			min-width: 0px;
+			cursor:pointer;
+		}
+		#startD, #endD {
+			width:60px;
+		}
+		input[title="오늘 날짜"]:hover, [title="일정제목"]:hover{
+			color:rgba(34, 34, 34, 0.7);
+		}   
+		.none{
+			display:none;
+			opacity:0;
+		}
+		.hidden{
+			visibility:hidden;
+			opacity:0;
+		}
+		.row{
+			display:flex;
+			flex-direction: row;
+		}
+		.column{
+			display:flex;
+			flex-direction:column;
+		}
+		.left-bar {
+		    position: relative;
+		    overflow-y: auto;
+		    flex: 1 1 auto;
+		    overflow-x: hidden;
+		}
+		.left-bar::-webkit-scrollbar{
+			width:4px;
+			height:4px;
+		}
+		.left-bar::-webkit-scrollbar-thumb{
+			height: 20%;
+			background-color: #e1e1e1;
+			border-radius: 2px;
+		}
+		
+	
+	</style>
+	
+	<script>
+	var workspaceId = <%=request.getParameter("workspaceId")%>;
+	var workspaceName = "<%=request.getParameter("workspaceName")%>";
+	var loginId = 4;<%-- <%=(Integer)session.getAttribute("whoAreYou")%>; --%>
+	$(function(){
+			$("#rightBar_schedule").empty();//아래 추가되면 
+			$.ajax({
+				type:"post",
+				url:"Controller?command=showTwoSchedule",
+				data:{
+					"workspaceId":workspaceId//문서가 저장된 공간id
+				},
+				datatype:"json",
+				success:function(data){
+					$.each(data, function(index, item) {
+						var schedule = "<div class='row' style='margin-top:10px;'>"
+							+"<div class='schedule_icon icon_sche2'></div>"
+							+"<div class='column' style='width: 226px;'>"
+							+"<input title='오늘 날짜' type='text' placeholder='오늘 날짜' value='"+item.start_date+" ~ "+item.finish_date+"' readonly/>"<!--datepicker-->
+							+"<input title='일정제목' type='text' placeholder='새 일정 제목 입력' scheduleId='"+item.scheduleId+"' value='"+item.title+"' readonly/>"
+							+"</div>"
+							+"</div>";	
+							
+							$("#rightBar_schedule").append(schedule);
+							$.ajax({
+								type:"post",
+								url:"Controller?command=scheduleGetter",
+								data:{
+									"scheduleId":item.scheduleId,
+								},
+								datatype:"json",
+								success:function(data){
+									//$.each(data, function(index, item){
+										$(".edit_title_container textarea").val(data.title);					
+										$("#schedule_start").val(data.startDate); //날짜 나오는 형식 다름
+										$("#schedule_end").val(data.finishDate);
+										$("#schedule_location > textarea").val(data.locations);
+										$("#schedule_summary > textarea").val(data.content);//여기까지는 성공
+										
+										$(".attendee_list ul li").each(function(index, item) {
+											var memberId = $(item).attr("scheduleattendee_id");
+											if(data.writerId==memberId){
+											$(".assign_list_span").text($(item).attr("name"));							
+												//참석자 배열만 풀어서 넣으면 됨.....!!!
+											}
+											var atd = data.attendee;
+											for(var i in atd){
+												if(atd[i]==memberId){
+													var setPickedMember = "<div class='selected_attendee' email='"+$(item).attr("email")+"' scheduleattendee_id='"+memberId+"'><span>"+$(item).text()+"</span></div>";
+													$("#schedule_modal .picked_attendee").append(setPickedMember);
+												}
+											}
+										});//each
+									},//success
+									error:function(r,s,e){
+										alert("error!");	
+								}
+									
+							});//small ajax
+						});//each
+				},
+				error:function(r,s,e){
+					alert("error!");
+				}
+		});	
+		
+	/* 	$(".post_schedule").on("click", function(){
+			
+		});
+				 */
+		});
+	</script>
+	
+<body>
+
+<!--오른쪽 위젯-->
+	 <div id="right_bar" class="left-bar column">
+		<div style="padding-bottom: 0px;">
+			<div class="post_schedule">공유된 일정</div>
+			<div id="rightBar_schedule">
+			<!-- <div class="row" style="margin-top:10px;">
+				<div class="schedule_icon icon_sche1"></div>
+				<div class="column">
+					<div class="row">
+						<input id="startD" title="시작 날짜" type="datepicker" placeholder="오늘 날짜" />datepicker
+						<span>~</span>
+						<input id="endD" title="종료 날짜" type="datepicker" /> 
+					</div>
+					<input id="scheT" title="일정제목" type="text" placeholder="새 일정 제목 입력"/>
+				</div>
+			</div> -->
+			
+			<!-- <div class="row" style="margin-top:10px;">
+				<div class="schedule_icon icon_sche2"></div>
+				<div class="column">
+					<input title="오늘 날짜" type="text" placeholder="오늘 날짜" value="7월 15일 ~ 7월 15일" readonly/>datepicker
+					<input title="일정제목" type="text" placeholder="새 일정 제목 입력" value="구조변경완료" readonly/>
+				</div>
+			</div>
+			
+			<div class="row" style="margin-top:10px;">
+				<div class="schedule_icon icon_sche2"></div>
+				<div class="column">
+					<input title="오늘 날짜" type="text" placeholder="오늘 날짜" value="7월 22일 ~ 7월 22일" readonly/>datepicker
+					<input title="일정제목" type="text" placeholder="새 일정 제목 입력" value="PROJECT발표" readonly/>
+				</div>
+			</div> -->
+			</div>
+		</div>
+	</div><!--위젯 끝-->
+	
+<!-- 	<script>
+	$(function(){
+		//datepicker 안됨
+		$("#startD, #endD").datepicker({//datepicker호출
+			dateFormat:"yy.mm.dd" ,showOthermonths: true ,showMonthAfterYear:true
+			,buttonImageOnly:true ,yearSuffix:"년", monthNames:["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"]
+			,dayNamesMin:["일", "월","화","수","목","금","토"]
+			, showButtonPanel:true, currentText:"오늘", closeText:"닫기"
+			,onSelect:function(dataText, inst) {
+				var d = dataText;
+			
+				var arr=d.split(".");
+				var year=arr[0]; //연도
+				var month=arr[1]; //월
+				var day=arr[2]; //일
+			}//뭐가 start인지 end인지 구분 해야됨
+		});
+		
+		//현재날짜 가져오기
+		$("#startD, #endD").datepicker("setDate", new Date()); 
+		
+		//finish가 start보다 전이면 start가 선택한 finish 날짜로 변함
+		$('#startD').datepicker("option", "onClose", function (selectedDate) {
+			$("#endD").datepicker("option", "minDate", selectedDate);
+		});
+	});
+	</script> -->
+</body>
+</html>

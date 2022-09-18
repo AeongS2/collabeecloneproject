@@ -1,0 +1,92 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<style>
+body, *{
+        font-family: -apple-system,BlinkMacSystemFont,Malgun Gothic,Hiragino Kaku Gothic ProN,Hiragino Sans,Meiryo,MS PGothic,sans-serif,Dotum;
+        margin:0;
+        padding:0;
+        box-sizing: border-box;
+        outline:none;
+    }
+    body{
+        height:100%;
+        overflow: auto !important;
+    }
+    .section3_web {
+        display:block;
+        height:340px;
+        background: url(https://cdn.collabee.co/front/collabee.co/hornet/524/static/media/bg-freetrial.8e4e0488.png) center center no-repeat rgb(0, 89, 73);;
+        text-align:center;
+        display: flex;
+        justify-content: center;
+    }
+    .title_sec4{
+        font-size: 34px;
+        font-weight: bold;
+        line-height: 1.47;
+        color: rgb(255, 255, 255);
+    }
+    .summary_sec4{
+        font-size:15px;
+        color: rgba(255, 255, 255, 0.8);
+        padding-top:13px;
+    }
+    .emailVal {
+        width: 330px;
+        height:50px;
+        border: 1px solid rgb(204, 204, 204);
+        border-radius: 6px;
+        font-size: 18px !important;
+        margin-top:30px; 
+        padding-left:13px;
+    }
+    .emailVal::placeholder{
+        color:rgb(204, 204, 204);
+    }
+    .free_start_bnt{
+        width: 162px;
+        height:55px;
+        border-radius: 6px;
+        margin-left: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        color: rgb(255, 255, 255);
+        background-color: rgb(217, 173, 43);
+        border-color:rgb(217, 173, 43);
+        line-height: 1.5;
+        cursor: pointer;
+        transition: background-color 0.2s ease 0s;
+    }
+    .free_start_bnt:hover{
+        background-color: rgb(189, 148, 26);
+    }
+    .start_login_bnt{
+        text-decoration:underline;
+        color:rgb(255, 255, 255);
+        cursor:pointer;
+        transition: color 0.2s ease 0s;
+    }
+    .start_login_bnt:hover{
+        color: rgb(217, 173, 43);
+    }
+    
+    </style>
+<body>
+	 <section class="section3_web">
+            <div style="padding:83px 0px 0px 4px;"><div class="title_sec4"><span>무료로 시작해 보세요.</span></div>
+                <input type ="text" class="emailVal" placeholder="email@company.com"/>
+                <input type="submit" class="free_start_bnt" value="무료로 시작하기"/><!--공란이면 안넘어감-->
+                <br/>
+                <div class="summary_sec4"><span >이미 가입하셨나요?</span>
+                    <span class="start_login_bnt">로그인하기</span>
+                </div>
+            </div>
+        </section>    
+</body>
+</html>
